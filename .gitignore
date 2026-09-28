@@ -1,0 +1,8 @@
+# local tooling and private notes never go into this (public) repo
+.claude/
+*.local.md
+__pycache__/
+*.pyc
+.mpl/
+.DS_Store
+Thumbs.db

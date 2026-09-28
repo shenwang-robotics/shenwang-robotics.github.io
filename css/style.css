@@ -1,0 +1,305 @@
+/* Design credits: Jon Barron, Deepak Pathak, Abhishek Kar, Saurabh Gupta.
+   Same look as the classic table-based template, rebuilt with flexbox so it works on phones. */
+
+:root {
+  --link: #1772d0;
+  --link-hover: #f09228;
+  --text: #111;
+  --muted: #555;
+  --font: 'Titillium Web', Verdana, Helvetica, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html { color-scheme: light; }
+
+body {
+  margin: 0;
+  background: #fff;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+a { color: var(--link); text-decoration: none; }
+a:focus, a:hover { color: var(--link-hover); }
+
+strong { font-weight: 600; }
+
+.page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px 20px 40px;
+}
+
+/* ---------- header + intro ---------- */
+
+.page-title {
+  margin: 16px 0 8px;
+  text-align: center;
+  font-size: 38px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.intro {
+  display: flex;
+  gap: 40px;
+  padding: 20px;
+}
+
+.intro-side { flex: 0 0 30%; min-width: 0; text-align: center; }
+.intro-side img { width: 100%; border-radius: 15px; display: block; }
+.intro-side .links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 12px;
+  margin: 14px 0 0;
+  line-height: 1.7;
+}
+.intro-side .links a { white-space: nowrap; }
+
+.intro-bio { flex: 1; min-width: 0; text-align: justify; }
+.intro-bio p { margin: 0 0 14px; }
+
+/* ---------- sections ---------- */
+
+hr {
+  border: 0;
+  height: 1px;
+  margin: 8px 0;
+  background-image: linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0));
+}
+
+.section-title {
+  margin: 0;
+  padding: 14px 10px 6px 20px;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.section-note { margin: 0; padding: 0 20px 4px; color: var(--muted); }
+
+.news, .plain-list { margin: 6px 0 14px; padding: 0 20px 0 55px; }
+.news li, .plain-list li { margin: 3px 0; }
+
+/* ---------- project rows (the "Publications" table in the original) ---------- */
+
+.project {
+  display: flex;
+  gap: 10px;
+  padding: 15px;
+}
+
+.project-media { flex: 0 0 40%; min-width: 0; text-align: center; }
+.project-media img,
+.project-media video {
+  width: 90%;
+  border-radius: 15px;
+  display: block;
+  margin: 0 auto;
+  background: #eee;
+}
+
+.project-text { flex: 1; min-width: 0; }
+.project-text p { margin: 0 0 8px; }
+
+.project-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.project-meta { color: var(--text); }
+.award { color: rgb(255, 100, 100); font-weight: 600; }
+
+.details { text-align: justify; font-style: italic; }
+
+pre.bib {
+  margin: 8px 0 0;
+  padding: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  background: #f6f6f6;
+  border-radius: 6px;
+}
+
+/* "abstract | bibtex" style toggles: buttons that look like links */
+button.linklike {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--link);
+  font: inherit;
+  cursor: pointer;
+}
+button.linklike:hover, button.linklike:focus { color: var(--link-hover); }
+
+/* ---------- misc ---------- */
+
+/* Unfilled placeholder — search the HTML for "todo" to find them all. */
+.todo { background: #fff3bf; border-radius: 3px; padding: 0 3px; }
+
+.footer {
+  margin: 30px 0 0;
+  text-align: right;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* ---------- phones ---------- */
+
+@media (max-width: 700px) {
+  .page { padding: 12px 16px 32px; }
+  .page-title { font-size: 30px; }
+  .intro { flex-direction: column; gap: 18px; padding: 12px 0; }
+  .intro-side { flex: none; }
+  .intro-side img { max-width: 160px; margin: 0 auto; }
+  .intro-bio { text-align: left; }
+  .section-title { padding-left: 0; }
+  .section-note { padding-left: 0; }
+  .news, .plain-list { padding: 0 0 0 22px; }
+  .project { flex-direction: column; padding: 14px 0; }
+  .project-media { flex: none; }
+  .project-media img, .project-media video { width: 100%; }
+  .details { text-align: left; }
+}
+
+/* ======================================================================
+   Project pages (projects/<id>/index.html)
+   ====================================================================== */
+
+.pp-back { margin: 4px 0 0; font-size: 15px; }
+
+.pp-header { text-align: center; padding: 10px 20px 0; }
+.pp-title {
+  margin: 14px 0 12px;
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+.pp-authors { margin: 0 0 4px; font-size: 18px; }
+.pp-affil { margin: 0 0 4px; color: var(--muted); }
+.pp-header .award { margin: 0; }
+
+.pp-teaser { max-width: 720px; margin: 24px auto 8px; padding: 0 20px; }
+.pp-teaser img, .pp-teaser video {
+  width: 100%;
+  border-radius: 15px;
+  display: block;
+  background: #eee;
+}
+
+.pp-section { padding: 0 20px; }
+.pp-section h2 { margin: 26px 0 8px; font-size: 22px; font-weight: 600; }
+.pp-section p { margin: 0 0 12px; text-align: justify; }
+.pp-section ul { margin: 0 0 12px; padding-left: 24px; }
+.pp-section li { margin: 4px 0; }
+
+.pp-section p.pp-eq { text-align: center; margin: 10px 0 14px; font-size: 17px; }
+
+figure { margin: 18px 0; }
+figure img { width: 100%; display: block; border-radius: 6px; }
+figure.fig-mid { max-width: 680px; margin-left: auto; margin-right: auto; }
+figure.fig-narrow { max-width: 420px; margin-left: auto; margin-right: auto; }
+.fig-row { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 14px 0 18px; }
+.fig-row img { flex: 1 1 220px; max-width: 280px; min-width: 0; height: auto; align-self: flex-start; border: 1px solid #ddd; border-radius: 6px; }
+figcaption { margin-top: 8px; font-size: 14px; color: var(--muted); text-align: justify; }
+
+/* looping clips: two figures (image or clip) side by side that stack on narrow screens */
+video, img { height: auto; } /* width/height attributes only set the aspect ratio, so the box keeps its shape before the media loads */
+figure video { width: 100%; display: block; border-radius: 6px; background: #eee; }
+.fig-row-video { align-items: flex-start; gap: 16px; }
+.fig-row-video figure { flex: 1 1 260px; max-width: 360px; min-width: 0; margin: 0; }
+.fig-row-video figure img,
+.fig-row-video figure video { width: 100%; max-width: none; border: 1px solid #ddd; }
+figure.fig-framed img, figure.fig-framed video { border: 1px solid #ddd; } /* white-background clip on its own */
+
+/* wide content scrolls inside its own box, never the page */
+.scroll-x { overflow-x: auto; }
+.scroll-x > svg { min-width: 680px; width: 100%; height: auto; display: block; }
+
+table.results {
+  width: 100%;
+  min-width: 560px;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+table.results th, table.results td { padding: 6px 10px; text-align: center; }
+table.results th:first-child, table.results td:first-child { text-align: left; }
+table.results thead th { border-bottom: 1px solid #333; font-weight: 600; }
+table.results tbody tr.group td {
+  padding-top: 12px;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 1px solid #ccc;
+}
+table.results td.best { font-weight: 600; }
+table.results td.base { color: var(--muted); }
+table.results td.fail { color: rgb(255, 100, 100); }
+
+@media (max-width: 700px) {
+  .pp-header { padding: 6px 0 0; }
+  .pp-title { font-size: 25px; }
+  .pp-authors { font-size: 16px; }
+  .pp-teaser, .pp-section { padding: 0; }
+  .pp-section p, figcaption { text-align: left; }
+}
+sup { line-height: 0; }
+
+/* ---------- interactive teaser ---------- */
+.sim {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  max-width: 100%;
+  border-radius: 15px;
+  overflow: hidden;
+  background: #e9ecf0;
+  cursor: pointer;
+  touch-action: pan-y;
+}
+.sim canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.sim .sim-fallback { width: 100%; height: 100%; object-fit: cover; border-radius: 0; }
+.sim.sim-ready .sim-fallback { display: none; }
+.sim-hud {
+  position: absolute; left: 14px; right: 14px; bottom: 12px;
+  display: flex; justify-content: space-between; align-items: center; gap: 10px;
+  font-size: 13px; pointer-events: none; opacity: 0;
+}
+.sim.sim-ready .sim-hud { opacity: 1; }
+.sim-state {
+  padding: 3px 10px 3px 22px; border-radius: 999px; position: relative;
+  background: rgba(255,255,255,0.82); color: #333; font-weight: 600; letter-spacing: 0.02em;
+}
+.sim-state::before {
+  content: ""; position: absolute; left: 9px; top: 50%; width: 7px; height: 7px; margin-top: -3.5px;
+  border-radius: 50%; background: #9aa3ad; transition: background 0.25s;
+}
+.sim.sim-running .sim-state::before { background: #2fb36a; }
+.sim-hint { color: #555; transition: opacity 0.3s; }
+.sim.sim-running .sim-hint { opacity: 0; }
+
+/* homepage thumbnail variant */
+.project-media .sim { display: block; width: 90%; margin: 0 auto; color: inherit; }
+.sim-compact .sim-hud { left: 8px; right: 8px; bottom: 7px; font-size: 11px; }
+.sim-compact .sim-state { padding: 2px 8px 2px 18px; }
+.sim-compact .sim-state::before { left: 7px; width: 6px; height: 6px; margin-top: -3px; }
+@media (max-width: 700px) { .project-media .sim { width: 100%; } }
+
+/* transparent variant (project page): no backdrop box; the canvas fades out at its edges so the floor shadow
+   never ends in a straight cut */
+.sim-transparent { background: none; border-radius: 0; overflow: visible; margin-bottom: 30px; }
+.sim-transparent canvas {
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 12%, #000 88%, transparent 100%),
+                      linear-gradient(to bottom, transparent 0, #000 4%, #000 92%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to right, transparent 0, #000 12%, #000 88%, transparent 100%),
+              linear-gradient(to bottom, transparent 0, #000 4%, #000 92%, transparent 100%);
+  mask-composite: intersect;
+}
+.sim-transparent .sim-hud { justify-content: center; gap: 14px; bottom: -26px; }
+.sim-transparent .sim-state { background: #eef0f3; }

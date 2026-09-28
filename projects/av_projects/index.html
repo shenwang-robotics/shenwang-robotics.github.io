@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Planning, SLAM-Based Navigation and Intersection Management — Shen Wang</title>
+  <meta name="description" content="Three projects from the Autonomous Vehicles course at Politecnico di Milano: sampling-based motion planning, SLAM-based navigation on a simulated TurtleBot3, and intersection management.">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Shen Wang">
+  <meta property="og:title" content="Planning, SLAM-Based Navigation and Intersection Management">
+  <meta property="og:description" content="Three projects from the Autonomous Vehicles course at Politecnico di Milano: sampling-based motion planning, SLAM-based navigation on a simulated TurtleBot3, and intersection management.">
+  <meta property="og:url" content="https://shenwang-robotics.github.io/projects/av_projects/">
+  <meta property="og:image" content="https://shenwang-robotics.github.io/images/av_projects/p2_replan3d_poster.jpg">
+  <meta property="og:image:width" content="960">
+  <meta property="og:image:height" content="540">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../../images/favicon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css?family=Titillium+Web:400,600,400italic,600italic,300,300italic" rel="stylesheet">
+  <link href="../../css/style.css?v=20260928b" rel="stylesheet">
+</head>
+
+<body>
+<div class="page">
+
+  <p class="pp-back"><a href="../../">&larr; Shen Wang</a></p>
+
+  <!-- ======================= HEADER ======================= -->
+  <header class="pp-header">
+    <h1 class="pp-title">Planning, SLAM-Based Navigation and Intersection Management</h1>
+    <p class="pp-authors"><strong>Shen Wang</strong></p>
+    <p class="pp-affil">
+      Autonomous Vehicles (Prof. Stefano Arrigoni)<br>
+      Politecnico di Milano · 2025
+    </p>
+  </header>
+
+  <figure class="pp-teaser">
+    <video data-autoplay data-src="../../images/av_projects/p2_replan3d.mp4" poster="../../images/av_projects/p2_replan3d_poster.jpg"
+           width="960" height="540" playsinline loop muted preload="none"></video>
+    <figcaption>
+      An unexpected obstacle (orange) blocks the route: the robot (blue) stops, plans a detour (purple) and resumes.
+      Replay of a logged Gazebo run, sped up with a slower view of the replanning event.
+      The inset shows the trajectory and laser scan on the map.
+    </figcaption>
+  </figure>
+
+  <!-- ======================= OVERVIEW ======================= -->
+  <section class="pp-section">
+    <h2>Overview</h2>
+    <p>
+      These three course projects explore how to find a route, get a robot to follow it, and coordinate several
+      vehicles when their routes cross.
+    </p>
+    <ul>
+      <li><strong>Planning.</strong> I implemented four sampling-based planners of the RRT family in MATLAB and
+        compared them with A* on grid maps.</li>
+      <li><strong>Navigation.</strong> I built a mapping, planning and control workflow for a simulated TurtleBot3,
+        including stopping and replanning when a new obstacle blocks its route.</li>
+      <li><strong>Intersection management.</strong> I implemented a central manager in MATLAB to coordinate up to
+        four vehicles at an intersection without traffic lights, and compared two priority policies.</li>
+    </ul>
+  </section>
+
+  <!-- ======================= PLANNING ======================= -->
+  <section class="pp-section">
+    <h2>Sampling-Based Planning: the RRT Family versus A*</h2>
+    <p>
+      RRT builds a tree by sampling positions and connecting them through free space. I implemented three variants
+      alongside it: RRT-Connect grows trees from both ends to find a route quickly; RRT* keeps improving the route
+      by changing connections in the tree; and Informed RRT* focuses later samples on a region that could contain
+      a shorter path.
+    </p>
+    <p>
+      I compared all four with A* on four obstacle maps at two resolutions, 30&nbsp;×&nbsp;30 and
+      300&nbsp;×&nbsp;300 cells, measuring path length, planning time and memory use. Each sampling planner ran
+      50 times per map and resolution with fixed random seeds.
+    </p>
+    <ul>
+      <li><strong>Finding a route quickly.</strong> RRT-Connect found the first path fastest among the sampling
+        planners on every map at both resolutions. Sampling was particularly useful on the larger grids, while
+        A* remained competitive on small ones.</li>
+      <li><strong>Improving path length.</strong> After further optimization, RRT* and Informed RRT* produced median
+        paths about 2–6.5&nbsp;% shorter than eight-direction A*. This is possible because their tree edges can
+        point in any direction; A* is optimal within its grid's allowed moves.</li>
+      <li><strong>Focusing the search.</strong> Informed RRT* helped most on map 2, where the route stays close to the
+        start–goal line. On the long detour in map 3, many samples fell outside the map, so it improved less than
+        RRT* within the same iteration budget.</li>
+    </ul>
+    <figure>
+      <img src="../../images/av_projects/p1_paths.png" alt="Solution paths of the RRT family and A* on the four maps">
+      <figcaption>
+        Example paths on the four 300&nbsp;×&nbsp;300 maps: the first routes found by RRT and RRT-Connect, and the
+        shorter routes after RRT* optimization. Dotted segments connect endpoints within the goal tolerance to the
+        exact goal and are included in the reported lengths.
+      </figcaption>
+    </figure>
+    <div class="fig-row fig-row-video">
+      <figure>
+        <img src="../../images/av_projects/p1_exploration.png" alt="RRT tree versus the cells expanded by A* on maps 1 and 3">
+        <figcaption>
+          On these larger maps, RRT reaches the goal with a sparse tree (left), while A* explores many more grid
+          cells (right). This helps explain standard RRT's smaller memory footprint in these tests.
+        </figcaption>
+      </figure>
+      <figure>
+        <video data-autoplay data-src="../../images/av_projects/p1_informed.mp4" poster="../../images/av_projects/p1_informed_poster.jpg"
+               width="720" height="720" playsinline loop muted preload="none"></video>
+        <figcaption>
+          Informed RRT* on map 2. After finding a first path, it samples within the purple ellipse, which shrinks as
+          shorter paths are found. Orange: new samples; grey: the tree; black: the best path so far.
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ======================= SLAM-BASED NAVIGATION ======================= -->
+  <section class="pp-section">
+    <h2>Mapping and Navigation on a TurtleBot3</h2>
+    <p>
+      I used a TurtleBot3 Burger in ROS&nbsp;2 / Gazebo, with planning and control written in MATLAB. First, I drove
+      the robot through the house by keyboard and built a map with <code>slam_toolbox</code>. The navigation system
+      then plans a route on this map and follows it with a waypoint controller that adjusts speed and heading from
+      the robot's estimated position.
+    </p>
+    <p>
+      <strong>Giving the robot room to turn.</strong> I tested two A* implementations against MATLAB's built-in
+      shortest-path solver, but following the shortest route exposed a practical problem: it passed too close to
+      furniture, and the robot tipped over at a tight corner in one run. I changed the route cost to favour more
+      space around obstacles. The resulting route, computed with MATLAB's solver, was 14.5&nbsp;% longer but gave
+      the robot much more room at that corner; it completed both repeat runs successfully.
+    </p>
+    <p>
+      <strong>Handling a blocked route.</strong> The robot compares its laser scans with the map. If repeated scans
+      reveal a new obstacle on the route ahead, it stops, adds the obstacle to the planning grid, and uses my
+      heap-based A* to find a detour before resuming. In the run shown at the top of the page, replanning took about
+      24&nbsp;ms and the robot reached its destination.
+    </p>
+    <p>
+      One choice was specific to this simulation: the final system relies on the nearly exact odometry for mapping
+      and localization. Scan matching and loop closure produced map distortions in the house's repetitive geometry,
+      so I disabled both after comparing the results. A real robot would need to account for odometry drift.
+    </p>
+    <figure class="fig-mid">
+      <video data-autoplay data-src="../../images/av_projects/p2_gazebo.mp4" poster="../../images/av_projects/p2_gazebo_poster.jpg"
+             width="960" height="540" playsinline loop muted preload="none"></video>
+      <figcaption>
+        Logged mapping run replayed at 16× speed, with the robot highlighted in blue. The inset shows scan coverage
+        on the final map, the recorded trajectory (blue) and the current laser scan (red).
+      </figcaption>
+    </figure>
+  </section>
+
+  <!-- ======================= INTERSECTION MANAGEMENT ======================= -->
+  <section class="pp-section">
+    <h2>Coordinating Vehicles at an Unsignalized Intersection</h2>
+    <p>
+      In this MATLAB simulation, vehicles approach a four-way intersection at random and choose to go straight,
+      turn left or turn right. Each vehicle controls its own motion, while a central manager decides when it may
+      enter. Vehicles with non-conflicting paths can cross together; before granting permission, the manager
+      simulates their expected motion to check for conflicts.
+    </p>
+    <p>
+      The first policy follows familiar yielding rules: give way to vehicles on the right, and, when turning left,
+      to oncoming vehicles going straight or turning right. These rules apply when the vehicles' paths conflict.
+    </p>
+    <figure>
+      <img src="../../images/av_projects/p4_trajectories.png" alt="The twelve fixed trajectories through the intersection, grouped by movement">
+      <figcaption>
+        The twelve fixed trajectories, one panel per movement and one colour per arm, with the stop lines and the
+        central conflict area (orange).
+      </figcaption>
+    </figure>
+    <p>
+      <strong>Breaking a deadlock.</strong> I extended the two-vehicle task to four vehicles, one per approach.
+      This creates situations where everyone waits for someone else: if all four turn left, each yields to the
+      vehicle on its right. The manager detects the standstill and gives one vehicle priority so traffic can move
+      again, while keeping the same conflict checks. I also implemented a first-come-first-served policy to avoid
+      this circular waiting.
+    </p>
+    <p>
+      I checked all 54 two-vehicle combinations against hand-worked expectations, then compared the policies in
+      repeated simulations at three traffic arrival rates. With identical traffic demand, first-come-first-served
+      reduced the observed deadlocks from ten to zero. Throughput and waiting times changed only slightly, with
+      no consistent improvement across both measures.
+    </p>
+    <figure class="fig-narrow fig-framed">
+      <video data-autoplay data-src="../../images/av_projects/p4_deadlock.mp4" poster="../../images/av_projects/p4_deadlock_poster.jpg"
+             width="640" height="640" playsinline loop muted preload="none"></video>
+      <figcaption>
+        Four left-turning vehicles would each wait for the one on their right. The manager gives the northern
+        vehicle priority, breaking the cycle so the others can follow. Colours show vehicle states.
+      </figcaption>
+    </figure>
+  </section>
+
+  <section class="pp-section">
+    <h2>Future Work</h2>
+    <p>
+      For the navigation project, the next step is to move from Gazebo to a real TurtleBot3. This would mean
+      combining odometry with laser-based localization to handle drift, then testing tracking and replanning with
+      real sensor noise and motion errors.
+    </p>
+  </section>
+
+  <section class="pp-section">
+    <h2>Acknowledgements</h2>
+    <p>
+      Many thanks to Prof. Stefano Arrigoni, who taught the Autonomous Vehicles course at Politecnico di Milano.
+    </p>
+  </section>
+
+  <p class="footer">
+    <a href="../../">&larr; Back to home</a>
+  </p>
+
+</div>
+
+<script src="../../js/site.js?v=20260928a"></script>
+</body>
+</html>

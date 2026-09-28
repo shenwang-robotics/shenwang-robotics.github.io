@@ -1,0 +1,7 @@
+gz_raw*.mp4
+inset*.mp4
+inset_last.png
+inset_size.txt
+frame_times*.npy
+*.log
+replay_b2.sdf

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Synergistic Anti-Scaling with Triboelectric Nanogenerators and Copper Alloy — Shen Wang</title>
+  <meta name="description" content="Bachelor's thesis at Dalian Maritime University: copper-alloy anti-scaling elements turned into solid–liquid triboelectric nanogenerators with embedded PTFE blocks, tested on a lab-built rig.">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Shen Wang">
+  <meta property="og:title" content="Synergistic Anti-Scaling with Triboelectric Nanogenerators and Copper Alloy">
+  <meta property="og:description" content="Bachelor's thesis at Dalian Maritime University: copper-alloy anti-scaling elements turned into solid–liquid triboelectric nanogenerators with embedded PTFE blocks, tested on a lab-built rig.">
+  <meta property="og:url" content="https://shenwang-robotics.github.io/projects/bsc_thesis/">
+  <meta property="og:image" content="https://shenwang-robotics.github.io/images/bsc_thesis/rig.jpg">
+  <meta property="og:image:width" content="694">
+  <meta property="og:image:height" content="454">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../../images/favicon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css?family=Titillium+Web:400,600,400italic,600italic,300,300italic" rel="stylesheet">
+  <link href="../../css/style.css?v=20260928b" rel="stylesheet">
+</head>
+
+<body>
+<div class="page">
+
+  <p class="pp-back"><a href="../../">&larr; Shen Wang</a></p>
+
+  <!-- ======================= HEADER ======================= -->
+  <header class="pp-header">
+    <h1 class="pp-title">Synergistic Anti-Scaling with Triboelectric Nanogenerators and Copper Alloy</h1>
+    <p class="pp-authors"><strong>Shen Wang</strong></p>
+    <p class="pp-affil">
+      Bachelor's thesis (Prof. Guobin Li), Marine Engineering College<br>
+      Dalian Maritime University · 2024
+    </p>
+  </header>
+
+  <figure class="pp-teaser">
+    <img src="../../images/bsc_thesis/rig.jpg" alt="Test rig: stirred tank with anti-scaling elements, DC motor and power supply" width="694" height="454">
+    <figcaption>
+      The test rig during a run: simulated hard cooling water in a 5&nbsp;L tank, stirred by a DC motor and impeller
+      held by a 3D-printed bracket; the element units stand around the tank wall.
+    </figcaption>
+  </figure>
+
+  <!-- ======================= OVERVIEW ======================= -->
+  <section class="pp-section">
+    <h2>Overview</h2>
+    <p>
+      I fabricated the test elements, built the experimental rig, and conducted and analysed five controlled
+      experiments to evaluate the anti-scaling performance of triboelectric–copper-alloy elements.
+    </p>
+    <p>
+      Scale, mostly calcium carbonate, builds up in the cooling-water system of a ship and cuts heat transfer.
+      Copper-alloy anti-scaling elements work without power or chemicals, but their effect is capped by how much alloy
+      fits in the pipe. The tested elements also act as solid–liquid triboelectric nanogenerators (SL-TENGs):
+      a PTFE block embedded in the alloy is charged by the flowing water, with the alloy as the electrode. The
+      extra charge speeds up the galvanic reaction of the alloy and holds scaling ions in an electric double layer,
+      so less scale should form.
+    </p>
+    <p>
+      The experiments used simulated hard cooling water in a stirred-tank rig and compared five groups, from no
+      treatment at all to elements that all carry a PTFE block. The thesis grew out of a student research project on
+      the same approach that I led from September 2022 to June 2023, whose anti-scaling device is protected by a
+      Chinese invention patent with me as a co-inventor
+      (<a href="https://patents.google.com/patent/CN116062913B/en">CN116062913B</a>, granted 2024).
+    </p>
+  </section>
+
+  <!-- ======================= ELEMENTS ======================= -->
+  <section class="pp-section">
+    <h2>Anti-Scaling Elements</h2>
+    <p>
+      The elements are cut from the copper alloy by wire EDM. Half of them get a square slot with a solid PTFE block
+      press-fitted into it, which, unlike the usual PTFE film, the flow cannot peel off.
+    </p>
+    <figure class="fig-mid">
+      <img src="../../images/bsc_thesis/elements.jpg" alt="Photo and model of a plain alloy element and of an element with a PTFE block" width="1095" height="444">
+      <figcaption>A plain alloy element and an element with a PTFE block, each shown as a photo and as a model.</figcaption>
+    </figure>
+    <p>
+      Three elements glued end to end form one unit, and ten units stand at equal spacing around the tank wall. The
+      treated groups differ only in how many elements of each unit carry a PTFE block (0, 1, 2 or 3), so a tank holds
+      0, 10, 20 or 30 of them among the same 30 elements.
+    </p>
+    <figure class="fig-mid">
+      <img src="../../images/bsc_thesis/units.jpg" alt="Element units with zero to three slots, and the arrangement of ten units in the tank" width="922" height="476">
+      <figcaption>Left: units with 0 to 3 slotted elements. Right: the ten units as arranged in the tank.</figcaption>
+    </figure>
+  </section>
+
+  <!-- ======================= RIG ======================= -->
+  <section class="pp-section">
+    <h2>Test Rig</h2>
+    <p>
+      The tank holds simulated hard cooling water, with calcium content and pH set from a Chinese industrial-water
+      standard. A DC motor at constant voltage drives an impeller that keeps the water moving, and a test coupon hangs
+      on a thread at a fixed position.
+    </p>
+    <p>
+      In the pre-test the motor vibrated badly on its acrylic mounting plate, so I designed a bracket in SolidWorks and
+      3D-printed it: the motor sits in it with an interference fit, a key and an internal shoulder stop it from turning
+      or sliding, and the two arms clip onto the rim of the tank lid. The printed impeller has a keyed bore that
+      matches the motor shaft, also with an interference fit.
+    </p>
+    <figure>
+      <img src="../../images/bsc_thesis/design.jpg" alt="SolidWorks models of the rig, the motor bracket and the impeller" width="1201" height="602">
+      <figcaption>(a) Model of the rig. (b) The motor bracket, alone and on the tank lid. (c) The impeller.</figcaption>
+    </figure>
+  </section>
+
+  <!-- ======================= EXPERIMENT ======================= -->
+  <section class="pp-section">
+    <h2>Experiment</h2>
+    <p>
+      The five groups share the same water, stirring and room temperature: a blank tank without elements, alloy
+      elements only, and alloy elements with 10, 20 or 30 PTFE blocks. Each group runs for 20 hours; every hour the
+      test coupon is taken out, dried, weighed and photographed. The scale-inhibition rate of each treated group
+      follows from the coupon mass gain relative to the blank.
+    </p>
+    <figure class="fig-narrow">
+      <img src="../../images/bsc_thesis/coupons.jpg" alt="Photos of the test coupons of the five groups every two hours" width="890" height="1854">
+      <figcaption>The coupons of the five groups (rows), every 2&nbsp;h.</figcaption>
+    </figure>
+  </section>
+
+  <!-- ======================= RESULTS ======================= -->
+  <section class="pp-section">
+    <h2>Results</h2>
+    <ul>
+      <li>In the first two hours the blank coupon already showed clear corrosion and scale, the alloy-only coupon
+        slight corrosion, and the coupons of the groups with PTFE blocks almost no change.</li>
+      <li>From about eight hours on, deposits appeared in the PTFE groups as well, more visibly the fewer PTFE blocks
+        a group had.</li>
+      <li>The inhibition rate rose with the number of PTFE blocks, and after about eight hours it was steadier in the
+        PTFE groups than in the alloy-only group, consistent with the mechanism above.</li>
+    </ul>
+  </section>
+
+  <section class="pp-section">
+    <h2>Future Work</h2>
+    <p>
+      Longer tests under real operating conditions, including heat-exchanger temperatures; better ways of mounting the
+      PTFE and the alloy; and scaling the device up from the lab tank to an actual cooling-water line.
+    </p>
+  </section>
+
+  <section class="pp-section">
+    <h2>Acknowledgements</h2>
+    <p>
+      Many thanks to Prof. Guobin Li for supervising this thesis.
+    </p>
+  </section>
+
+  <p class="footer">
+    <a href="../../">&larr; Back to home</a>
+  </p>
+
+</div>
+
+<script src="../../js/site.js?v=20260928a"></script>
+</body>
+</html>

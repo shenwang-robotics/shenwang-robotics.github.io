@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<!-- Link-preview image for the homepage and the dl_lab page (images/og_card.jpg), rendered with headless Chrome:
+     see tools/og/make_card.sh. The robot is the same live teaser, pressing the sponge. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link href="../../css/style.css" rel="stylesheet">
+  <style>
+    html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; background: #e9ecf0; }
+    .sim { width: 1120px; margin: 0 auto; border-radius: 0; }
+    .sim-hud, .sim-fallback { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="sim" id="s" data-assets="../../assets/panda/"></div>
+  <script src="../../js/site.js"></script>
+  <script>
+    (function press() {
+      var el = document.getElementById('s');
+      if (el.__sim) el.__sim.setHover(true); else setTimeout(press, 100);
+    })();
+  </script>
+</body>
+</html>

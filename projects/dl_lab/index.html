@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Physics-Informed Transformer for Contact-Force Prediction — Shen Wang</title>
+  <meta name="description" content="Predicting 3-axis contact forces 0.24 s ahead on a Franka Panda with a physics-informed encoder–decoder Transformer.">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Shen Wang">
+  <meta property="og:title" content="Physics-Informed Transformer for Contact-Force Prediction">
+  <meta property="og:description" content="Predicting 3-axis contact forces 0.24 s ahead on a Franka Panda with a physics-informed encoder–decoder Transformer.">
+  <meta property="og:url" content="https://shenwang-robotics.github.io/projects/dl_lab/">
+  <meta property="og:image" content="https://shenwang-robotics.github.io/images/og_card.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../../images/favicon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css?family=Titillium+Web:400,600,400italic,600italic,300,300italic" rel="stylesheet">
+  <link href="../../css/style.css?v=20260928b" rel="stylesheet">
+</head>
+
+<body>
+<div class="page">
+
+  <p class="pp-back"><a href="../../">&larr; Shen Wang</a></p>
+
+  <!-- ======================= HEADER ======================= -->
+  <header class="pp-header">
+    <h1 class="pp-title">Physics-Informed Transformer for In-Context Contact-Force Prediction on a Franka Panda</h1>
+    <p class="pp-authors">Gabriele Lupo Pasini, Jiangquan Wei, <strong>Shen Wang</strong></p>
+    <p class="pp-affil">
+      Lab – Mechanical Engineering Applications of Deep Learning (Prof. Loris Roveda)<br>
+      Politecnico di Milano · 2026
+    </p>
+    <p class="award">Grade: 30 cum laude</p>
+  </header>
+
+  <!-- Interactive teaser (js/franka_teaser.js): idle until the pointer is over it, then presses the sponge.
+       The <img> is the fallback when WebGL or JS modules are unavailable. -->
+  <div class="pp-teaser">
+    <div class="sim sim-transparent" id="franka-sim" data-assets="../../assets/panda/" data-bg="transparent">
+      <img class="sim-fallback" src="../../images/project_placeholder.svg" alt="Franka Panda pressing on a sponge">
+      <div class="sim-hud">
+        <span class="sim-state">Standby</span>
+        <span class="sim-hint">Hover to start</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================= OVERVIEW ======================= -->
+  <section class="pp-section">
+    <h2>Overview</h2>
+    <p>
+      Predicting contact forces ahead of time could help a robot adjust its motion before force builds up. We use the recent motion and force
+      history, together with the robot's planned trajectory, to predict three-axis contact forces over the next
+      0.24&nbsp;s. A simple contact model provides a physics-based force estimate to help an encoder–decoder
+      Transformer make this prediction. We test the approach on a Franka Panda, including contact conditions not
+      seen during training and recordings from another lab.
+    </p>
+    <p>
+      The prediction is in-context: the network uses the latest observations to account for the current contact
+      conditions, without retraining its weights when the surface changes.
+    </p>
+  </section>
+
+  <!-- ======================= DATA ======================= -->
+  <section class="pp-section">
+    <h2>Data</h2>
+    <p>
+      We recorded end-effector motion and force on a real Franka Panda under impedance control, with the end-effector
+      pressing on a sponge and on a rigid table. The robot follows a chirp trajectory, an oscillating motion whose
+      frequency changes over time, so we can observe the contact response at different frequencies. We also raised
+      the sponge to test changes in contact height. A second dataset was provided by the IDSIA lab.
+    </p>
+    <figure>
+      <img src="../../images/dl_lab/chirp.png" alt="Frequency-modulated chirp reference signal">
+      <figcaption>Normalized chirp reference z<sub>r</sub>(t) used during data collection (time in seconds).</figcaption>
+    </figure>
+  </section>
+
+  <!-- ======================= METHOD ======================= -->
+  <section class="pp-section">
+    <h2>Method</h2>
+    <p>
+      The encoder reads about 0.35&nbsp;s of recent motion and measured force. This tells the network how the robot
+      has been moving and how the surface has responded. The decoder combines this history with the planned
+      position, velocity and acceleration to predict the upcoming contact force.
+    </p>
+    <p>
+      <strong>Estimating the contact parameters.</strong> A small network called the physics head reads the encoder's
+      summary and estimates stiffness, damping and inertia (K, C, M) for each axis. These are effective parameters
+      for the current window: they stay fixed within it and are estimated again as new observations arrive.
+      The simplest contact model uses them in a spring–damper–mass equation:
+    </p>
+    <p class="pp-eq">F<sub>phys</sub> = K&thinsp;(x<sub>0</sub> − x) − C&thinsp;v − M&thinsp;a</p>
+    <p>
+      Here x, v and a are position, velocity and acceleration, and x<sub>0</sub> is the estimated resting position
+      of the contact surface. We estimate x<sub>0</sub> from low-force samples, with a position-based fallback when
+      too few are available. During inference, this estimate uses the current history window.
+    </p>
+
+    <p>
+      <strong>Physics embedding.</strong> We combine the estimated parameters with the planned future motion to
+      calculate a reference force. Its three components are added to the decoder's nine trajectory channels,
+      giving twelve input channels at each time step. The decoder uses this reference, the trajectory and the
+      encoded history to produce the final prediction, F<sub>pred</sub>. This gives the network a physics-based
+      starting point while leaving it room to capture behaviour that the simple contact model misses.
+      In our earlier loss-only version, the force from the contact model was used in the training loss but was
+      not supplied to the decoder.
+    </p>
+
+    <figure class="fig-mid">
+      <img src="../../images/dl_lab/architecture.png" alt="Physics-informed Transformer architecture">
+      <figcaption>
+        The physics head turns the observed history into contact parameters; the physics token is the reference
+        force supplied to the decoder. Each sample represents 1&nbsp;ms. The decoder window overlaps the history
+        by 112 samples; its final 240 samples cover the future 0.24&nbsp;s used for training and evaluation.
+      </figcaption>
+    </figure>
+
+    <p>
+      <strong>Training.</strong> We use two loss terms: one makes the predicted force match the measurements, and
+      the other encourages the contact model to agree with that prediction.
+    </p>
+    <p class="pp-eq">L = Huber(F<sub>pred</sub>, F) + λ&thinsp;Huber(F<sub>phys</sub>, sg[F<sub>pred</sub>])</p>
+    <p>
+      Here F is the measured force and λ = 0.25. For the physics loss, F<sub>phys</sub> is calculated from the recorded actual
+      motion. The stop-gradient operation sg[·] treats F<sub>pred</sub> as a fixed target in this term, training the
+      physics head and encoder to find parameters that explain it. We give the pressing direction, z, more weight
+      and compute both losses in normalized coordinates.
+    </p>
+
+    <p>
+      <strong>Three contact models.</strong> We compare the spring–damper–mass model (MCK), which treats each axis
+      independently, with coupled MCK, where motion along one axis can affect force along another. We also test
+      Hunt–Crossley, which models a nonlinear relationship between compression and force using K, C and an exponent
+      n. All three share the same overall framework, with different contact equations and parameter estimates.
+    </p>
+    <div class="fig-row">
+      <img src="../../images/dl_lab/model_mck.png" alt="MCK contact model">
+      <img src="../../images/dl_lab/model_coupled.png" alt="Coupled MCK contact model">
+      <img src="../../images/dl_lab/model_hc.png" alt="Hunt–Crossley contact model">
+    </div>
+  </section>
+
+  <!-- ======================= RESULTS ======================= -->
+  <section class="pp-section">
+    <h2>Experiments and Results</h2>
+    <p>
+      We compared four models: the three physics-informed variants and a purely data-driven Transformer baseline.
+      Each was trained in two settings: on PoliMi recordings alone, and on a mix of PoliMi and IDSIA data.
+      We evaluated them on the training data and on separate test sets from both labs.
+    </p>
+    <p>
+      In the PoliMi tests, in-distribution (ID) means contact with the same type of sponge used for training,
+      including raised-sponge runs. Out-of-distribution (OOD) tests replace the sponge with the rigid table.
+      Testing PoliMi-trained models on IDSIA recordings also lets us examine transfer between labs.
+    </p>
+
+    <figure>
+      <img src="../../images/dl_lab/pred_id.png" alt="Measured and predicted z-axis contact force on a PoliMi sponge sequence">
+      <figcaption>
+        In distribution: measured (black) and predicted z-axis force on a PoliMi sponge sequence, with all models
+        trained on PoliMi data. The models follow the broad force trend but differ in local accuracy.
+        Predictions are joined in 240-sample windows, which explains the jumps at their boundaries.
+      </figcaption>
+    </figure>
+
+    <figure>
+      <img src="../../images/dl_lab/ood_idsia.png" alt="Measured and predicted z-axis contact force on an IDSIA test sequence">
+      <figcaption>
+        Out of distribution, IDSIA: z-axis force predictions from models trained on PoliMi data only.
+        The data-driven baseline drifts away from the measured force over several intervals; the physics-informed
+        models also make errors, with no single variant closest throughout.
+      </figcaption>
+    </figure>
+
+    <ul>
+      <li>The comparisons show the benefit of adding a contact model, particularly on unfamiliar contact conditions.</li>
+      <li>No single physics-informed variant was consistently best in our experiments.</li>
+      <li>The estimated parameters show a useful qualitative trend: stiffness rises and damping falls on the table
+        compared with the sponge.</li>
+    </ul>
+  </section>
+
+  <!-- ======================= FUTURE WORK ======================= -->
+  <section class="pp-section">
+    <h2>Future Work</h2>
+    <ul>
+      <li>Move from offline prediction to a control loop that uses the predicted forces to adjust the robot's motion.</li>
+      <li>Add a friction model to better describe contact forces along x and y.</li>
+      <li>Validate the estimated contact parameters and explore whether they can help distinguish materials.</li>
+    </ul>
+  </section>
+
+  <section class="pp-section">
+    <h2>Acknowledgements</h2>
+    <p>
+      Many thanks to Prof. Loris Roveda, who taught the Deep Learning Lab course at Politecnico di Milano, and to IDSIA
+      for sharing their dataset.
+      The interactive robot at the top is an illustration built from the Franka Panda model in
+      <a href="https://github.com/google-deepmind/mujoco_menagerie">MuJoCo Menagerie</a> (Apache-2.0) and
+      <a href="https://threejs.org/">three.js</a>.
+    </p>
+  </section>
+
+  <p class="footer">
+    <a href="../../">&larr; Back to home</a>
+  </p>
+
+</div>
+
+<script src="../../js/site.js?v=20260928a"></script>
+</body>
+</html>
