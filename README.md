@@ -10,7 +10,8 @@ and no build step. Layout adapted from the [Jon Barron](https://jonbarron.info/)
 index.html            home: bio, news, project rows, education, honors
 projects/<id>/        one detail page per project (index.html); the home row's title and thumbnail link here
 css/style.css         all styles
-js/site.js            show/hide toggles, e-mail assembly, lazy video playback (on screen or on hover), lazy mount of the 3D teaser
+js/site.js            show/hide toggles, e-mail assembly, lazy video playback (on screen or on hover), lazy mount of the 3D teaser,
+                      time-on-page event and owner opt-out for the analytics
 js/franka_teaser.js   interactive three.js teaser: a Franka Panda presses a sponge while the pointer hovers
 js/vendor/            three.js r180 (MIT), vendored so the site runs offline
 assets/panda/         decimated Franka Panda model + baked IK table (see assets/panda/README.md)
@@ -58,6 +59,13 @@ file, otherwise browsers keep serving the cached copy.
   without a backdrop. On an `<a>` element, `data-touch="link"` makes taps follow the link instead of toggling.
 - Tunables (press depth, idle height, camera) are the constants at the top of `js/franka_teaser.js`.
 - Rendering pauses while the element is off screen or the tab is hidden; without WebGL the fallback `<img>` stays.
+
+## Analytics
+
+[Umami Cloud](https://umami.is/) (cookieless). The tag sits in every page's `<head>`; `data-domains` limits it to the live
+site, so local previews are not counted. `js/site.js` sends a `time-on-page` event (visible time only) when a visitor
+leaves a page, and the CV link carries `data-umami-event="cv-click"`. Open any page once with `?notrack` to stop
+counting your own visits in that browser; `?track` undoes it.
 
 ## Third-party material
 

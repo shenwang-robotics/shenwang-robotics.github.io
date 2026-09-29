@@ -1,3 +1,13 @@
+// Analytics opt-out for the owner: open any page once with ?notrack to stop counting this browser (?track undoes it).
+// This file runs before the deferred Umami script, which sends nothing while umami.disabled is set.
+(function () {
+  try {
+    var q = new URLSearchParams(location.search);
+    if (q.has('notrack')) localStorage.setItem('umami.disabled', '1');
+    if (q.has('track')) localStorage.removeItem('umami.disabled');
+  } catch (e) {} // storage blocked: nothing to switch
+})();
+
 // Show/hide blocks: any element with data-toggle="<id>" flips the `hidden` attribute of #<id>.
 // Used for "details" and "bibtex" links in project rows and "show more" in News.
 document.addEventListener('click', function (e) {
@@ -70,3 +80,31 @@ document.querySelectorAll('.sim[data-assets]').forEach(function (el) {
   }, { rootMargin: '300px' });
   io.observe(el);
 });
+
+// Time on page for the analytics. Umami gives a one-page visit a duration of 0, so count the time the tab is
+// actually visible and send one "time-on-page" event when the visitor leaves (close, reload, link, back).
+(function () {
+  var visible = 0, since = document.visibilityState === 'visible' ? Date.now() : null;
+  function pause() {
+    if (since !== null) { visible += Date.now() - since; since = null; }
+  }
+  function range(s) {
+    return s < 10 ? '0-10 s' : s < 30 ? '10-30 s' : s < 60 ? '30-60 s'
+      : s < 180 ? '1-3 min' : s < 600 ? '3-10 min' : '10+ min';
+  }
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'hidden') pause();
+    else if (since === null) since = Date.now();
+  });
+  window.addEventListener('pagehide', function () {
+    pause();
+    var s = Math.round(visible / 1000);
+    visible = 0;
+    if (s < 1 || !window.umami || typeof window.umami.track !== 'function') return;
+    window.umami.track('time-on-page', { page: location.pathname, seconds: s, range: range(s) });
+  });
+  // Back/forward cache can show the same page again after pagehide: start a fresh count.
+  window.addEventListener('pageshow', function (e) {
+    if (e.persisted) since = document.visibilityState === 'visible' ? Date.now() : null;
+  });
+})();
