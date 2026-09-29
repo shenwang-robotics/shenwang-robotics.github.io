@@ -19,6 +19,7 @@ tools/build_panda.py  regenerates assets/panda/ from the MuJoCo Menagerie model
 images/               photos, figures and clips, one sub-folder per project
 data/                 PDFs (CV, reports)
 .nojekyll             tells GitHub Pages not to run Jekyll
+robots.txt            asks AI-training crawlers not to crawl; search engines and AI search stay allowed
 ```
 
 ## Preview locally
